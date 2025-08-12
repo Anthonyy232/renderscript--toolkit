@@ -1,11 +1,16 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
+    id 'maven-publish'
+    id 'signing'
 }
+
+group = "io.github.Anthonyy232"
+version = "1.0.0"
 
 android {
     namespace 'com.example.renderscripttoolkit'
-    compileSdk 35
+    compileSdkVersion 35
 
     defaultConfig {
         minSdk 21
@@ -44,4 +49,56 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.16.0'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create("release", MavenPublication) {
+                from components["release"]
+
+                groupId = 'io.github.Anthonyy232'
+                artifactId = 'renderscript--toolkit'
+                version = '1.0.0'
+
+                pom {
+                    name.set("RenderScriptToolkit")
+                    description.set("Fork of Android library for image processing using RenderScript with updated dependencies")
+                    url.set("https://github.com/Anthonyy232/renderscript--toolkit")
+                    licenses {
+                        license {
+                            name.set("The Apache License, Version 2.0")
+                            url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set("Anthonyy232")
+                            name.set("Anthony La")
+                            email.set("anthonyyla.dev@gmail.com")
+                        }
+                    }
+                    scm {
+                        connection.set("scm:git:git://github.com/Anthonyy232/renderscript--toolkit.git")
+                        developerConnection.set("scm:git:ssh://github.com:Anthonyy232/renderscript--toolkit.git")
+                        url.set("https://github.com/Anthonyy232/renderscript--toolkit")
+                    }
+                }
+            }
+        }
+        repositories {
+            maven {
+                name = "OSSRH"
+                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                credentials {
+                    username = ossrhUsername
+                    password = ossrhPassword
+                }
+            }
+        }
+    }
+
+    signing {
+        sign publishing.publications["release"]
+    }
 }

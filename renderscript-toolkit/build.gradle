@@ -5,24 +5,23 @@ plugins {
     id 'signing'
 }
 
-group = "io.github.Anthonyy232"
-version = "1.0.0"
+group = 'io.github.anthonyy232'
+version = '1.0.0'
 
 android {
-    namespace 'com.example.renderscripttoolkit'
+    namespace = 'com.example.renderscripttoolkit'
     compileSdkVersion 35
 
-    defaultConfig {
-        minSdk 21
-        targetSdk 35
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
-        externalNativeBuild {
-            cmake {
-                cppFlags "-std=c++17"
-            }
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
         }
+    }
+
+    defaultConfig {
+        minSdk = 21
+        consumerProguardFiles 'consumer-rules.pro'
+        testInstrumentationRunner = 'androidx.test.runner.AndroidJUnitRunner'
     }
 
     buildTypes {
@@ -31,74 +30,78 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
+
     kotlinOptions {
         jvmTarget = '17'
     }
-    externalNativeBuild {
-        cmake {
-            path file('src/main/cpp/CMakeLists.txt')
-        }
-    }
-    ndkVersion '29.0.13113456 rc1'
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.16.0'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
 }
 
 afterEvaluate {
     publishing {
         publications {
-            create("release", MavenPublication) {
-                from components["release"]
-
-                groupId = 'io.github.Anthonyy232'
-                artifactId = 'renderscript--toolkit'
-                version = '1.0.0'
+            release(MavenPublication) {
+                from components.release
 
                 pom {
-                    name.set("RenderScriptToolkit")
-                    description.set("Fork of Android library for image processing using RenderScript with updated dependencies")
-                    url.set("https://github.com/Anthonyy232/renderscript--toolkit")
+                    name = 'RenderScriptToolkit'
+                    description = 'Forked Android RenderScript toolkit with updated dependencies'
+                    url = 'https://github.com/Anthonyy232/renderscript-toolkit'
+
                     licenses {
                         license {
-                            name.set("The Apache License, Version 2.0")
-                            url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                         }
                     }
+
                     developers {
                         developer {
-                            id.set("Anthonyy232")
-                            name.set("Anthony La")
-                            email.set("anthonyyla.dev@gmail.com")
+                            id = 'anthonyy232'
+                            name = 'Anthony La'
+                            email = 'anthonyyla.dev@gmail.com'
                         }
                     }
+
                     scm {
-                        connection.set("scm:git:git://github.com/Anthonyy232/renderscript--toolkit.git")
-                        developerConnection.set("scm:git:ssh://github.com:Anthonyy232/renderscript--toolkit.git")
-                        url.set("https://github.com/Anthonyy232/renderscript--toolkit")
+                        connection = 'scm:git:git://github.com/Anthonyy232/renderscript-toolkit.git'
+                        developerConnection = 'scm:git:ssh://github.com/Anthonyy232/renderscript-toolkit.git'
+                        url = 'https://github.com/Anthonyy232/renderscript-toolkit'
                     }
                 }
             }
         }
+
         repositories {
             maven {
-                name = "OSSRH"
-                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                name = 'MavenCentral'
+                url = 'https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/'
                 credentials {
-                    username = ossrhUsername
-                    password = ossrhPassword
+                    username = findProperty('ossrhUsername') as String
+                    password = findProperty('ossrhPassword') as String
                 }
             }
         }
     }
+}
 
-    signing {
-        sign publishing.publications["release"]
-    }
+signing {
+    // The signing plugin will automatically read the signing properties from your
+    // gradle.properties file. It will only activate if they are present.
+    // It will automatically sign all publications defined in the publishing {} block.
+    useGpgCmd()
+    sign(publishing.publications)
 }
